@@ -4,15 +4,13 @@ defmodule Norms do
   """
   import Norm
 
-  def error do
-    {:error, spec(is_binary())}
-  end
+  defmacro result(ok_predicate, error_predicate \\ nil) do
+    error_predicate = error_predicate || quote do: spec(is_binary())
 
-  defmacro result(predicate) do
     quote do
       one_of([
-        {:ok, unquote(predicate)},
-        error()
+        {:ok, unquote(ok_predicate)},
+        {:error, unquote(error_predicate)}
       ])
     end
   end
@@ -20,7 +18,7 @@ defmodule Norms do
   def simple_result do
     one_of([
       :ok,
-      error()
+      {:error, spec(is_binary())}
     ])
   end
 
